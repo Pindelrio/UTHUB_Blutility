@@ -5,9 +5,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
 
-#include "Misc/FileHelper.h"
-#include "Misc/Paths.h"
-#include "Engine/Engine.h"
+#include "Engine/StaticMeshActor.h"
 
 #pragma region ListAssetsHelpers
 FString GenerateIndentation(int32 Level)
@@ -99,4 +97,81 @@ void UTarea2UtilsLib::ExportStringArrayToFile(const TArray<FString>& InExportLis
 	{
 		UE_LOG(LogTemp, Error, TEXT("No se pudo generar el archivo: %s"), *FilePath);
 	}
+}
+
+
+bool HasMoreThanXTris(const AStaticMeshActor* InStaticMeshActor, const int32& InNumOfTris)
+{
+	const UStaticMeshComponent* MeshComponent = InStaticMeshActor->GetStaticMeshComponent();
+	if (!MeshComponent)	return false;
+	const UStaticMesh* Mesh = MeshComponent->GetStaticMesh();
+	if (!Mesh->GetRenderData())	return false;
+
+	int32 TotalTriangles = 0;
+	for (int32 LODIndex = 0; LODIndex < Mesh->GetNumLODs(); ++LODIndex)
+	{
+		const FStaticMeshLODResources& LODResources = Mesh->GetRenderData()->LODResources[LODIndex];
+		for (const FStaticMeshSection& Section : LODResources.Sections)
+		{
+			TotalTriangles += Section.NumTriangles;
+		}
+	}
+
+	if (TotalTriangles > InNumOfTris)
+		return true;
+
+	return false; 
+}
+
+bool HasMoreThanXMaterialSlots(const AStaticMeshActor* InStaticMeshActor, const int32& InNumSlots)
+{
+	const UStaticMeshComponent* MeshComponent = InStaticMeshActor->GetStaticMeshComponent();
+	if (!MeshComponent)	return false;
+	const UStaticMesh* Mesh = MeshComponent->GetStaticMesh();
+	if (!Mesh->GetRenderData())	return false;
+	
+	const int32 MaterialSlots = Mesh->GetStaticMaterials().Num();
+	if (MaterialSlots > InNumSlots)
+		return true; 
+
+	return false;
+}
+
+bool AbsoluteSpaceHigherThanX(const AStaticMeshActor* InStaticMeshActor, float InNumUnits)
+{
+	
+	const UStaticMeshComponent* MeshComponent = InStaticMeshActor->GetStaticMeshComponent();
+	if (!MeshComponent) return false;
+
+	const FBoxSphereBounds Bounds = MeshComponent->Bounds;
+	const FVector BoxExtent = Bounds.BoxExtent;
+	const FVector BoxSize = BoxExtent * 2.0f;   // Tamaño total (longitud, ancho, altura)
+
+	float AbsoluteSize = BoxSize.X * BoxSize.Y * BoxSize.Z;
+
+	if (AbsoluteSize > InNumUnits)
+		return true; 
+
+	return true;
+}
+
+void WriteJson(const FString& String, bool bHasManyTris, bool bHasManyMats, bool bIsMassive)
+{
+	 IFileManager& FileManager = IFileManager::Get();
+	
+}
+
+bool UTarea2UtilsLib::EvaluateSMConditions(const AStaticMeshActor* InStaticMeshActor)
+{
+	bool bHasManyTris = HasMoreThanXTris(InStaticMeshActor, 10000);
+	bool bHasManyMats = HasMoreThanXMaterialSlots(InStaticMeshActor, 5);
+	bool bIsMassive = AbsoluteSpaceHigherThanX(InStaticMeshActor, 6000);
+
+	// SMJsonList.Add(FString::Printf(TEXT("%s { bHasManyTri: %s, bHasManyMats: %s, bIsMassive: %s }"),
+	// 	InStaticMeshActor->GetName(),
+	// 	bHasManyTris,
+	// 	bHasManyMats,
+	// 	bIsMassive));
+	
+	return bHasManyTris && bHasManyMats && bIsMassive;
 }

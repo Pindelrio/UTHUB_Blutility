@@ -6,20 +6,27 @@
 
 #include "Tarea2UtilsLib.generated.h"
 
-/**
- * 
- */
+class AStaticMeshActor;
+class FJsonObject;
+
 UCLASS()
 class TAREA2PLUGIN_API UTarea2UtilsLib : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+	
 public:
-	UFUNCTION(BlueprintCallable, Category = "Utiles")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tarea2Utils")
+	TArray<FString> SMJsonList;
+	
+	UFUNCTION(BlueprintCallable, Category = "Tarea2Utils")
 	static void ListAssetsDependencies(const FARFilter& Filter, const FString& InFileName);
 
-	UFUNCTION(BlueprintCallable, Category = "Utiles")
+	UFUNCTION(BlueprintCallable, Category = "Tarea2Utils")
 	static void ExportStringArrayToFile(const TArray<FString>& InExportList, const FString& InFileName);
+
+	UFUNCTION(BlueprintCallable, Category = "Tarea2Utils")
+	static bool EvaluateSMConditions(const AStaticMeshActor* InStaticMeshActor);
 };
 
 
