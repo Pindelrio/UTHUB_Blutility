@@ -17,6 +17,13 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "Tarea2Plugin",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
 		}
 	]
 }

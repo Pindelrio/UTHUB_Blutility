@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Tarea2Plugin",
+	"Description": "UTHUB_Blutility",
+	"Category": "Other",
+	"CreatedBy": "Pin del Rio",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Tarea2Plugin",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}

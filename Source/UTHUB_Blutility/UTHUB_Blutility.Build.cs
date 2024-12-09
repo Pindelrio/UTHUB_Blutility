@@ -8,7 +8,7 @@ public class UTHUB_Blutility : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","Tarea2Plugin" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
