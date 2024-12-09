@@ -16,7 +16,7 @@ class TAREA2PLUGIN_API UTarea2UtilsLib : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Utiles")
-	static void ListAssetsDependencies(const FString& InFileName);
+	static void ListAssetsDependencies(const FARFilter& Filter, const FString& InFileName);
 
 	UFUNCTION(BlueprintCallable, Category = "Utiles")
 	static void ExportStringArrayToFile(const TArray<FString>& InExportList, const FString& InFileName);

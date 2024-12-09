@@ -20,28 +20,39 @@ FString GenerateIndentation(int32 Level)
 	return Indentation;
 }
 
-void ListDependenciesRecursive(const FName& AssetName, IAssetRegistry& AssetRegistry, TArray<FString>& OutputLines, int32 Level)
+void ListDependenciesStack(const FName& RootAssetName, IAssetRegistry& AssetRegistry, TArray<FString>& OutputLines)
 {
-	FString Indentation = GenerateIndentation(Level);
-	OutputLines.Add(FString::Printf(TEXT("%s|- %s"), *Indentation, *AssetName.ToString()));
+	// Pila para procesar los assets
+	TArray<TPair<FName, int32>> Stack_AssetLevel; 
+	Stack_AssetLevel.Push(TPair<FName, int32>(RootAssetName, 0));
 
-	TArray<FName> Dependencies;
-	AssetRegistry.GetDependencies(AssetName, Dependencies);
-
-	for (const FName& DependencyName : Dependencies)
+	while (Stack_AssetLevel.Num() > 0)
 	{
-		ListDependenciesRecursive(DependencyName, AssetRegistry, OutputLines, Level + 1);
+		TPair<FName, int32> Current = Stack_AssetLevel.Pop(); 
+		FName CurrentAssetName = Current.Key;
+		int32 Level = Current.Value;
+
+		FString Indentation = GenerateIndentation(Level);
+		OutputLines.Add(FString::Printf(TEXT("%s|- %s"), *Indentation, *CurrentAssetName.ToString()));
+
+		TArray<FName> Dependencies;
+		AssetRegistry.GetDependencies(CurrentAssetName, Dependencies);
+
+		for (const FName& DependencyName : Dependencies)
+		{
+			Stack_AssetLevel.Push(TPair<FName, int32>(DependencyName, Level + 1));
+		}
 	}
 }
 #pragma endregion ListAssetsHelpers
 
-void UTarea2UtilsLib::ListAssetsDependencies(const FString& InFileName)
+void UTarea2UtilsLib::ListAssetsDependencies(const FARFilter& Filter, const FString& InFileName)
 {
 	const auto& AssetRegistryModule = FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
 
 	TArray<FAssetData> AssetDataList;
-	AssetRegistry.GetAllAssets(AssetDataList);
+	AssetRegistry.GetAssets(Filter,AssetDataList);
 
 	TArray<FString> OutputLines;
 	
@@ -51,7 +62,7 @@ void UTarea2UtilsLib::ListAssetsDependencies(const FString& InFileName)
 		OutputLines.Add( FString::Printf(TEXT("AssetRoot [ROOT]: %s\n"), *RootAssetName));
 
 		//Recursiva
-		ListDependenciesRecursive(AssetData.PackageName, AssetRegistry, OutputLines, 1);
+		ListDependenciesStack(AssetData.PackageName, AssetRegistry, OutputLines);
 	}
 	
 	FString OutputText = FString::Join(OutputLines, TEXT("\n"));	
